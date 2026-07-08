@@ -39,19 +39,23 @@ values
   ('OR', 'OR', null, null),
   ('致键', '致键', null, null),
   ('老李', '老李', null, null),
-  ('主机位', '主机位', null, null),
   ('一木', '一木', null, null),
-  ('迷弟', '迷弟', null, null),
   ('陌轩', '陌轩', null, null),
   ('胖虎', '胖虎', null, null),
-  ('衍一', '衍一', null, null),
-  ('mx', 'mx', null, null),
+  ('熊星', '熊星', null, null),
+  ('CupX', 'CupX', null, null),
   ('nico', 'nico', null, null),
+  ('可乐', '可乐', null, null),
   ('Roy', 'Roy', null, null),
   ('一维', '一维', null, null),
-  ('可乐', '可乐', null, null),
-  ('CupX', 'CupX', null, null)
-on conflict (photographer_code) do update set display_name = excluded.display_name;
+  ('迷弟', '迷弟', null, null),
+  ('寿司', '寿司', null, null),
+  ('小蒲', '小蒲', null, null)
+on conflict (photographer_code) do update set display_name = excluded.display_name, is_active = true;
+
+update photographers
+set is_active = false
+where photographer_code not in ('鲨鱼', 'OR', '致键', '老李', '一木', '陌轩', '胖虎', '熊星', 'CupX', 'nico', '可乐', 'Roy', '一维', '迷弟', '寿司', '小蒲');
 
 insert into program_dancers (program_id, dancer_id)
 select p.id, d.id

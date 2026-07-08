@@ -382,7 +382,7 @@ export default function PhotographerPage() {
                   取消
                 </button>
                 <button type="submit" disabled={wechatModalSaving} className="sgc-button-primary px-4 py-3">
-                  {wechatModalSaving ? "保存中..." : "保存并可约"}
+                  {wechatModalSaving ? "保存中..." : "保存"}
                 </button>
               </div>
             </form>

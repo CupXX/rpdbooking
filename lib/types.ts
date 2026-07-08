@@ -22,6 +22,8 @@ export type Photographer = {
   is_active: boolean | null;
 };
 
+export type PhotographerOption = Pick<Photographer, "photographer_code" | "display_name">;
+
 export type DancerSearchProgram = Program & {
   dancers: Array<Pick<Dancer, "nickname" | "display_name">>;
   available_photographers: Array<{
@@ -44,6 +46,7 @@ export type DashboardProgram = Program & {
 
 export type DashboardResponse = {
   photographer: {
+    photographer_code: string;
     display_name: string;
     wechat: string | null;
     sample_url: string | null;

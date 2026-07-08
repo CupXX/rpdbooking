@@ -40,7 +40,20 @@ export default function DancerPage() {
   }
 
   async function copyText(value: string) {
-    await navigator.clipboard.writeText(value);
+    try {
+      await navigator.clipboard.writeText(value);
+    } catch {
+      const textarea = document.createElement("textarea");
+      textarea.value = value;
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      textarea.style.top = "0";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+    }
     setToast("已复制");
     window.setTimeout(() => setToast(""), 1600);
   }
@@ -49,7 +62,7 @@ export default function DancerPage() {
     <main className="sgc-shell px-4 py-5">
       <div className="sgc-content mx-auto w-full max-w-md space-y-5">
         <header className="space-y-2">
-          <Link href="/" className="sgc-link text-sm">返回首页</Link>
+          <Link href="/photographer" className="sgc-link text-sm">摄影页</Link>
           <p className="text-sm font-semibold text-white">SGC三周年庆典</p>
           <h1 className="text-2xl font-black text-white">舞者约拍查询</h1>
         </header>
@@ -96,7 +109,7 @@ export default function DancerPage() {
 
                 <div className="mt-4 space-y-2">
                   {program.available_photographers.length === 0 ? (
-                    <p className="rounded-lg border border-white/15 bg-white/5 px-3 py-3 text-sm text-white/60">当前暂无可接摄影，请稍后刷新查看。</p>
+                    <p className="rounded-lg border border-white/15 bg-white/5 px-3 py-3 text-sm text-white/60">当前暂无可约摄影，请稍后刷新查看。</p>
                   ) : (
                     program.available_photographers.map((photographer) => (
                       <div key={photographer.id} className="flex items-center justify-between gap-3 rounded-lg border border-white/15 px-3 py-3">

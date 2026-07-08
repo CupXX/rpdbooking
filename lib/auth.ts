@@ -69,16 +69,6 @@ export function setSessionCookie(response: NextResponse, photographerId: string)
   });
 }
 
-export function clearSessionCookie(response: NextResponse) {
-  response.cookies.set(SESSION_COOKIE, "", {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: 0,
-  });
-}
-
 export async function getCurrentPhotographerId() {
   const cookieStore = await cookies();
   const token = cookieStore.get(SESSION_COOKIE)?.value;

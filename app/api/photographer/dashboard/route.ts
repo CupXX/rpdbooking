@@ -76,6 +76,7 @@ export async function GET() {
 
     return Response.json({
       photographer: {
+        photographer_code: photographer.photographer_code,
         display_name: photographer.display_name,
         wechat: photographer.wechat,
         sample_url: photographer.sample_url,

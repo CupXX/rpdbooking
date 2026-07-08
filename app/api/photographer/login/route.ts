@@ -9,7 +9,7 @@ export async function POST(request: Request) {
   const body = await readJson(request);
   const photographerCode = asNonEmptyString(body?.photographer_code);
 
-  if (!photographerCode) return jsonError("请输入摄影 ID。");
+  if (!photographerCode) return jsonError("请选择摄影。");
 
   try {
     const supabase = getSupabaseAdmin();
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
 
     if (!photographer) {
       return NextResponse.json(
-        { success: false, message: "未找到该摄影 ID，请确认是否已登记。" },
+        { success: false, message: "未找到该摄影，请确认是否已登记。" },
         { status: 404 },
       );
     }
@@ -35,6 +35,6 @@ export async function POST(request: Request) {
     return response;
   } catch (error) {
     console.error(error);
-    return jsonError("登录失败，请稍后重试。", 500);
+    return jsonError("选择摄影失败，请稍后重试。", 500);
   }
 }

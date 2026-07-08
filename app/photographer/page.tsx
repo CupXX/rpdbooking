@@ -2,18 +2,19 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import type { DashboardProgram, DashboardResponse } from "@/lib/types";
+import type { DashboardProgram, DashboardResponse, PhotographerOption } from "@/lib/types";
 
 type PendingAvailabilityAction =
   | { kind: "single"; program: DashboardProgram }
   | { kind: "bulk" };
 
-export default function PhotographerDashboardPage() {
-  const router = useRouter();
+export default function PhotographerPage() {
+  const [photographers, setPhotographers] = useState<PhotographerOption[]>([]);
+  const [selectedPhotographerCode, setSelectedPhotographerCode] = useState("");
   const [data, setData] = useState<DashboardResponse | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [selecting, setSelecting] = useState(false);
   const [savingProgramId, setSavingProgramId] = useState<string | null>(null);
   const [bulkLoading, setBulkLoading] = useState(false);
   const [editingProfile, setEditingProfile] = useState(false);
@@ -25,30 +26,80 @@ export default function PhotographerDashboardPage() {
   const [wechatModalError, setWechatModalError] = useState("");
   const [wechatModalSaving, setWechatModalSaving] = useState(false);
 
-  async function loadDashboard() {
-    setLoading(true);
-    setError("");
-    try {
-      const response = await fetch("/api/photographer/dashboard", { cache: "no-store" });
-      const responseData = await response.json();
-      if (!response.ok) {
-        setError(responseData.message ?? "获取数据失败，请重新登录。");
+  async function loadPhotographers() {
+    const response = await fetch("/api/photographer/list", { cache: "no-store" });
+    const responseData = await response.json();
+    if (!response.ok) throw new Error(responseData.message ?? "获取摄影名单失败。");
+    setPhotographers(responseData.photographers ?? []);
+  }
+
+  async function loadDashboard(options: { silentUnauthorized?: boolean } = {}) {
+    const response = await fetch("/api/photographer/dashboard", { cache: "no-store" });
+    const responseData = await response.json();
+    if (!response.ok) {
+      if (response.status === 401 && options.silentUnauthorized) {
+        setData(null);
         return;
       }
-      const dashboard = responseData as DashboardResponse;
-      setData(dashboard);
-      setWechat(dashboard.photographer.wechat ?? "");
-      setSampleUrl(dashboard.photographer.sample_url ?? "");
-    } catch {
-      setError("网络异常，请稍后重试。");
-    } finally {
-      setLoading(false);
+      throw new Error(responseData.message ?? "获取数据失败，请重新选择摄影。");
     }
+
+    const dashboard = responseData as DashboardResponse;
+    setData(dashboard);
+    setSelectedPhotographerCode(dashboard.photographer.photographer_code);
+    setWechat(dashboard.photographer.wechat ?? "");
+    setSampleUrl(dashboard.photographer.sample_url ?? "");
   }
 
   useEffect(() => {
-    void loadDashboard();
+    async function loadInitialData() {
+      setLoading(true);
+      setError("");
+      try {
+        await loadPhotographers();
+        await loadDashboard({ silentUnauthorized: true });
+      } catch (loadError) {
+        setError(loadError instanceof Error ? loadError.message : "加载失败，请稍后重试。");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    void loadInitialData();
   }, []);
+
+  async function choosePhotographer(photographerCode: string) {
+    setSelectedPhotographerCode(photographerCode);
+    setError("");
+    setProfileMessage("");
+    setPendingAvailability(null);
+
+    if (!photographerCode) {
+      setData(null);
+      return;
+    }
+
+    setSelecting(true);
+    try {
+      const response = await fetch("/api/photographer/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ photographer_code: photographerCode }),
+      });
+      const responseData = await response.json();
+      if (!response.ok || !responseData.success) {
+        setError(responseData.message ?? "选择摄影失败，请稍后重试。");
+        setData(null);
+        return;
+      }
+      await loadDashboard();
+    } catch {
+      setError("网络异常，请稍后重试。");
+      setData(null);
+    } finally {
+      setSelecting(false);
+    }
+  }
 
   function needsWechatBeforeAvailable() {
     return !data?.photographer.wechat?.trim();
@@ -100,7 +151,7 @@ export default function PhotographerDashboardPage() {
   }
 
   async function bulkUpdate(available: boolean) {
-    const label = available ? "一键全部可约" : "一键全部不可约";
+    const label = available ? "全部可约" : "全部不可约";
     if (!window.confirm(`确认${label}吗？`)) return;
 
     setBulkLoading(true);
@@ -197,22 +248,33 @@ export default function PhotographerDashboardPage() {
     }
   }
 
-  async function logout() {
-    await fetch("/api/photographer/logout", { method: "POST" });
-    router.push("/photographer/login");
-  }
-
   return (
     <main className="sgc-shell px-4 py-5">
       <div className="sgc-content mx-auto w-full max-w-md space-y-4">
-        <header className="flex items-start justify-between gap-4">
-          <div>
-            <Link href="/" className="sgc-link text-sm">返回首页</Link>
-            <p className="mt-2 text-sm font-semibold text-white">SGC三周年庆典</p>
-            <h1 className="mt-1 text-2xl font-black text-white">摄影管理页</h1>
-          </div>
-          <button type="button" onClick={logout} className="sgc-button-secondary px-3 py-2 text-sm">退出登录</button>
+        <header className="space-y-2">
+          <Link href="/dancer" className="sgc-link text-sm">舞者页</Link>
+          <p className="text-sm font-semibold text-white">SGC三周年庆典</p>
+          <h1 className="text-2xl font-black text-white">摄影可约管理</h1>
         </header>
+
+        <section className="sgc-panel p-4">
+          <label className="sgc-label block" htmlFor="photographerSelect">选择摄影</label>
+          <select
+            id="photographerSelect"
+            value={selectedPhotographerCode}
+            onChange={(event) => void choosePhotographer(event.target.value)}
+            disabled={loading || selecting}
+            className="sgc-input mt-2 px-4 py-3 text-base"
+          >
+            <option value="">请选择摄影</option>
+            {photographers.map((photographer) => (
+              <option key={photographer.photographer_code} value={photographer.photographer_code}>
+                {photographer.display_name}
+              </option>
+            ))}
+          </select>
+          {selecting ? <p className="sgc-muted mt-3 text-sm">切换中...</p> : null}
+        </section>
 
         {loading ? <p className="sgc-panel p-4 text-white/70">加载中...</p> : null}
         {error ? <p className="rounded-lg border border-red-300/40 bg-red-950/50 p-4 text-sm text-red-200">{error}</p> : null}
@@ -222,7 +284,7 @@ export default function PhotographerDashboardPage() {
             <section className="sgc-panel p-4">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
-                  <p className="sgc-subtle text-sm">摄影师</p>
+                  <p className="sgc-subtle text-sm">当前摄影</p>
                   <h2 className="mt-1 text-xl font-bold text-white">{data.photographer.display_name}</h2>
                   <p className="sgc-muted mt-2 break-all text-sm">微信号：{data.photographer.wechat || "未填写"}</p>
                   {data.photographer.sample_url ? <p className="sgc-muted mt-1 break-all text-sm">样片：{data.photographer.sample_url}</p> : null}
@@ -254,7 +316,7 @@ export default function PhotographerDashboardPage() {
                     const members = program.dancers
                       .map((dancer) => dancer.display_name ?? dancer.nickname)
                       .join("、");
-                    const disabled = savingProgramId === program.id || bulkLoading;
+                    const disabled = savingProgramId === program.id || bulkLoading || selecting;
 
                     return (
                       <tr key={program.id} className="align-middle">
@@ -290,7 +352,9 @@ export default function PhotographerDashboardPage() {
               </table>
             </section>
           </>
-        ) : null}
+        ) : (
+          !loading ? <p className="sgc-panel p-4 text-sm text-white/70">请先选择摄影。</p> : null
+        )}
       </div>
 
       {pendingAvailability ? (

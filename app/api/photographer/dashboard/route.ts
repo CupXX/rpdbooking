@@ -1,9 +1,20 @@
 import { getCurrentPhotographerId } from "@/lib/auth";
 import { jsonError } from "@/lib/http";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
-import type { DashboardProgram, Photographer, Program } from "@/lib/types";
+import type { Dancer, DashboardProgram, Photographer, Program } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
+
+type MaybeArray<T> = T | T[] | null;
+
+type ProgramDancerRow = {
+  program_id: string;
+  dancers: MaybeArray<Pick<Dancer, "nickname" | "display_name">>;
+};
+
+function firstRelated<T>(value: MaybeArray<T>) {
+  return Array.isArray(value) ? value[0] ?? null : value;
+}
 
 export async function GET() {
   const photographerId = await getCurrentPhotographerId();
@@ -11,7 +22,12 @@ export async function GET() {
 
   try {
     const supabase = getSupabaseAdmin();
-    const [{ data: photographerData, error: photographerError }, { data: programsData, error: programsError }, { data: statusData, error: statusError }] = await Promise.all([
+    const [
+      { data: photographerData, error: photographerError },
+      { data: programsData, error: programsError },
+      { data: statusData, error: statusError },
+      { data: dancersData, error: dancersError },
+    ] = await Promise.all([
       supabase
         .from("photographers")
         .select("id, photographer_code, display_name, wechat, sample_url, is_active")
@@ -26,11 +42,15 @@ export async function GET() {
         .from("photographer_program_status")
         .select("program_id, available")
         .eq("photographer_id", photographerId),
+      supabase
+        .from("program_dancers")
+        .select("program_id, dancers(nickname, display_name)"),
     ]);
 
     if (photographerError) throw photographerError;
     if (programsError) throw programsError;
     if (statusError) throw statusError;
+    if (dancersError) throw dancersError;
 
     const photographer = photographerData as Photographer | null;
     if (!photographer) return jsonError("登录状态无效，请重新登录。", 401);
@@ -38,9 +58,19 @@ export async function GET() {
     const programs = (programsData ?? []) as Program[];
     const statusRows = (statusData ?? []) as Array<{ program_id: string; available: boolean }>;
     const statusByProgramId = new Map(statusRows.map((row) => [row.program_id, row.available]));
+    const dancersByProgramId = new Map<string, Array<Pick<Dancer, "nickname" | "display_name">>>();
+
+    for (const row of (dancersData ?? []) as unknown as ProgramDancerRow[]) {
+      const dancer = firstRelated(row.dancers);
+      if (!dancer) continue;
+      const existing = dancersByProgramId.get(row.program_id) ?? [];
+      existing.push(dancer);
+      dancersByProgramId.set(row.program_id, existing);
+    }
 
     const responsePrograms: DashboardProgram[] = programs.map((program) => ({
       ...program,
+      dancers: dancersByProgramId.get(program.id) ?? [],
       available: statusByProgramId.get(program.id) ?? false,
     }));
 

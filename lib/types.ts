@@ -38,6 +38,7 @@ export type DancerSearchResponse = {
 };
 
 export type DashboardProgram = Program & {
+  dancers: Array<Pick<Dancer, "nickname" | "display_name">>;
   available: boolean;
 };
 

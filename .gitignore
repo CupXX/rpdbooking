@@ -4,5 +4,5 @@ node_modules
 .env*.local
 *.tsbuildinfo
 .npm-cache
-dev-server.log
+dev-server*.log
 .codex-remote-attachments

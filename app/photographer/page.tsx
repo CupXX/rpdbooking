@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import Link from "next/link";
 import type { DashboardProgram, DashboardResponse, PhotographerOption } from "@/lib/types";
 
 type PendingAvailabilityAction =
@@ -252,9 +251,8 @@ export default function PhotographerPage() {
     <main className="sgc-shell px-4 py-5">
       <div className="sgc-content mx-auto w-full max-w-md space-y-4">
         <header className="space-y-2">
-          <Link href="/dancer" className="sgc-link text-sm">舞者页</Link>
           <p className="text-sm font-semibold text-white">SGC三周年庆典</p>
-          <h1 className="text-2xl font-black text-white">摄影可约管理</h1>
+          <h1 className="text-2xl font-black text-white">直拍摄影管理</h1>
         </header>
 
         <section className="sgc-panel p-4">

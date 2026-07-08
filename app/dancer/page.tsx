@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import Link from "next/link";
 import type { DancerSearchProgram, DancerSearchResponse } from "@/lib/types";
 
 type PhotographerDetail = DancerSearchProgram["available_photographers"][number];
@@ -62,7 +61,6 @@ export default function DancerPage() {
     <main className="sgc-shell px-4 py-5">
       <div className="sgc-content mx-auto w-full max-w-md space-y-5">
         <header className="space-y-2">
-          <Link href="/photographer" className="sgc-link text-sm">摄影页</Link>
           <p className="text-sm font-semibold text-white">SGC三周年庆典</p>
           <h1 className="text-2xl font-black text-white">舞者约拍查询</h1>
         </header>
@@ -103,7 +101,7 @@ export default function DancerPage() {
 
                 {program.dancers.length > 0 ? (
                   <p className="sgc-muted mt-3 text-sm leading-6">
-                    同组舞者：{program.dancers.map((dancer) => dancer.display_name ?? dancer.nickname).join("、")}
+                    {program.dancers.map((dancer) => dancer.display_name ?? dancer.nickname).join("、")}
                   </p>
                 ) : null}
 

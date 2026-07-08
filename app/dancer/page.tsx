@@ -62,7 +62,7 @@ export default function DancerPage() {
       <div className="sgc-content mx-auto w-full max-w-md space-y-5">
         <header className="space-y-2">
           <p className="text-sm font-semibold text-white">SGC三周年庆典</p>
-          <h1 className="text-2xl font-black text-white">舞者约拍查询</h1>
+          <h1 className="text-2xl font-black text-white">可约摄影查询</h1>
         </header>
 
         <form onSubmit={handleSearch} className="sgc-panel p-4">

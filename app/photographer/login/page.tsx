@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 export default function PhotographerLoginPage() {
   const router = useRouter();
   const [photographerCode, setPhotographerCode] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -20,19 +19,11 @@ export default function PhotographerLoginPage() {
       const response = await fetch("/api/photographer/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ photographer_code: photographerCode, password }),
+        body: JSON.stringify({ photographer_code: photographerCode }),
       });
       const data = await response.json();
       if (!response.ok || !data.success) {
         setError(data.message ?? "登录失败，请稍后重试。");
-        return;
-      }
-      if (data.needs_setup) {
-        const params = new URLSearchParams({
-          code: data.photographer_code ?? photographerCode,
-          name: data.display_name ?? "",
-        });
-        router.push(`/photographer/setup?${params.toString()}`);
         return;
       }
       router.push("/photographer/dashboard");
@@ -62,18 +53,8 @@ export default function PhotographerLoginPage() {
             placeholder="例如 CupX"
           />
 
-          <label className="sgc-label mt-4 block" htmlFor="password">密码</label>
-          <input
-            id="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            className="sgc-input mt-2 px-4 py-3 text-base"
-            type="password"
-            placeholder="首次设置前可留空"
-          />
-
           <button type="submit" disabled={loading} className="sgc-button-primary mt-5 w-full px-4 py-3 text-base">
-            {loading ? "登录中..." : "登录"}
+            {loading ? "进入中..." : "进入管理页"}
           </button>
           {error ? <p className="mt-3 text-sm leading-6 text-red-300">{error}</p> : null}
         </form>

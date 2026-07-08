@@ -17,7 +17,6 @@ export type Photographer = {
   id: string;
   photographer_code: string;
   display_name: string;
-  password_hash: string | null;
   wechat: string | null;
   sample_url: string | null;
   is_active: boolean | null;

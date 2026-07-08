@@ -14,7 +14,7 @@ export async function GET() {
     const [{ data: photographerData, error: photographerError }, { data: programsData, error: programsError }, { data: statusData, error: statusError }] = await Promise.all([
       supabase
         .from("photographers")
-        .select("id, photographer_code, display_name, password_hash, wechat, sample_url, is_active")
+        .select("id, photographer_code, display_name, wechat, sample_url, is_active")
         .eq("id", photographerId)
         .eq("is_active", true)
         .maybeSingle(),

@@ -15,7 +15,6 @@ export default function PhotographerDashboardPage() {
   const [editingProfile, setEditingProfile] = useState(false);
   const [wechat, setWechat] = useState("");
   const [sampleUrl, setSampleUrl] = useState("");
-  const [password, setPassword] = useState("");
   const [profileMessage, setProfileMessage] = useState("");
 
   async function loadDashboard() {
@@ -105,7 +104,7 @@ export default function PhotographerDashboardPage() {
       const response = await fetch("/api/photographer/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ wechat, sample_url: sampleUrl, password }),
+        body: JSON.stringify({ wechat, sample_url: sampleUrl }),
       });
       const responseData = await response.json();
       if (!response.ok || !responseData.success) {
@@ -116,7 +115,6 @@ export default function PhotographerDashboardPage() {
         ...current,
         photographer: { ...current.photographer, wechat, sample_url: sampleUrl || null },
       } : current);
-      setPassword("");
       setEditingProfile(false);
       setProfileMessage("资料已更新。");
     } catch {
@@ -163,8 +161,6 @@ export default function PhotographerDashboardPage() {
                   <input id="wechat" value={wechat} onChange={(event) => setWechat(event.target.value)} className="sgc-input mt-2 px-4 py-3" />
                   <label className="sgc-label mt-4 block" htmlFor="sampleUrl">样片链接</label>
                   <input id="sampleUrl" value={sampleUrl} onChange={(event) => setSampleUrl(event.target.value)} className="sgc-input mt-2 px-4 py-3" />
-                  <label className="sgc-label mt-4 block" htmlFor="newPassword">新密码</label>
-                  <input id="newPassword" type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="不修改可留空" className="sgc-input mt-2 px-4 py-3" />
                   <button type="submit" className="sgc-button-primary mt-4 w-full px-4 py-3">保存资料</button>
                 </form>
               ) : null}

@@ -3,9 +3,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 const SESSION_COOKIE = "suiwu_session";
-const SETUP_COOKIE = "suiwu_setup_code";
 const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7;
-const SETUP_MAX_AGE_SECONDS = 60 * 15;
 
 type SessionPayload = {
   photographerId: string;
@@ -86,29 +84,4 @@ export async function getCurrentPhotographerId() {
   const token = cookieStore.get(SESSION_COOKIE)?.value;
   if (!token) return null;
   return verifyToken(token)?.photographerId ?? null;
-}
-
-export function setSetupCookie(response: NextResponse, photographerCode: string) {
-  response.cookies.set(SETUP_COOKIE, photographerCode, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: SETUP_MAX_AGE_SECONDS,
-  });
-}
-
-export function clearSetupCookie(response: NextResponse) {
-  response.cookies.set(SETUP_COOKIE, "", {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: 0,
-  });
-}
-
-export async function getSetupPhotographerCode() {
-  const cookieStore = await cookies();
-  return cookieStore.get(SETUP_COOKIE)?.value ?? null;
 }

@@ -44,37 +44,38 @@ export default function PhotographerLoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-paper px-4 py-5">
-      <div className="mx-auto w-full max-w-md space-y-5">
+    <main className="sgc-shell px-4 py-5">
+      <div className="sgc-content mx-auto w-full max-w-md space-y-5">
         <header className="space-y-2">
-          <Link href="/" className="text-sm font-medium text-zinc-500">返回首页</Link>
-          <h1 className="text-2xl font-semibold text-ink">摄影登录</h1>
+          <Link href="/" className="sgc-link text-sm">返回首页</Link>
+          <p className="text-sm font-semibold text-white">SGC三周年庆典</p>
+          <h1 className="text-2xl font-black text-white">摄影登录</h1>
         </header>
 
-        <form onSubmit={handleLogin} className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
-          <label className="block text-sm font-medium text-zinc-700" htmlFor="photographerCode">摄影 ID</label>
+        <form onSubmit={handleLogin} className="sgc-panel p-4">
+          <label className="sgc-label block" htmlFor="photographerCode">摄影 ID</label>
           <input
             id="photographerCode"
             value={photographerCode}
             onChange={(event) => setPhotographerCode(event.target.value)}
-            className="mt-2 w-full rounded-lg border border-zinc-300 px-4 py-3 text-base outline-none focus:border-emerald-600"
-            placeholder="例如 nico001"
+            className="sgc-input mt-2 px-4 py-3 text-base"
+            placeholder="例如 CupX"
           />
 
-          <label className="mt-4 block text-sm font-medium text-zinc-700" htmlFor="password">密码</label>
+          <label className="sgc-label mt-4 block" htmlFor="password">密码</label>
           <input
             id="password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
-            className="mt-2 w-full rounded-lg border border-zinc-300 px-4 py-3 text-base outline-none focus:border-emerald-600"
+            className="sgc-input mt-2 px-4 py-3 text-base"
             type="password"
             placeholder="首次设置前可留空"
           />
 
-          <button type="submit" disabled={loading} className="mt-5 w-full rounded-lg bg-ink px-4 py-3 text-base font-semibold text-white">
+          <button type="submit" disabled={loading} className="sgc-button-primary mt-5 w-full px-4 py-3 text-base">
             {loading ? "登录中..." : "登录"}
           </button>
-          {error ? <p className="mt-3 text-sm leading-6 text-red-600">{error}</p> : null}
+          {error ? <p className="mt-3 text-sm leading-6 text-red-300">{error}</p> : null}
         </form>
       </div>
     </main>

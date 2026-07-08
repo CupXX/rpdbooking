@@ -6,3 +6,6 @@ node_modules
 .npm-cache
 dev-server*.log
 .codex-remote-attachments
+
+.vercel
+.env*

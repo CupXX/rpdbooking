@@ -50,13 +50,20 @@ create index if not exists idx_program_dancers_program_id on program_dancers(pro
 create index if not exists idx_photographer_program_status_program_id on photographer_program_status(program_id);
 create index if not exists idx_photographer_program_status_photographer_id on photographer_program_status(photographer_id);
 
+alter table programs enable row level security;
+alter table dancers enable row level security;
+alter table program_dancers enable row level security;
+alter table photographers enable row level security;
+alter table photographer_program_status enable row level security;
+
 create or replace function set_updated_at()
 returns trigger as $$
 begin
   new.updated_at = now();
   return new;
 end;
-$$ language plpgsql;
+$$ language plpgsql
+set search_path = public;
 
 drop trigger if exists photographers_set_updated_at on photographers;
 create trigger photographers_set_updated_at

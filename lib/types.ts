@@ -27,7 +27,7 @@ export type DancerSearchProgram = Program & {
   available_photographers: Array<{
     id: string;
     display_name: string;
-    wechat: string;
+    wechat: string | null;
     sample_url: string | null;
   }>;
 };

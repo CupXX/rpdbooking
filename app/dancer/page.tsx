@@ -132,8 +132,10 @@ export default function DancerPage() {
             <div className="mt-5 space-y-4">
               <div>
                 <p className="sgc-label">微信号</p>
-                <p className="mt-1 break-all text-base text-white">{selectedPhotographer.wechat}</p>
-                <button type="button" onClick={() => copyText(selectedPhotographer.wechat)} className="sgc-button-primary mt-2 w-full px-4 py-3">复制微信</button>
+                <p className="mt-1 break-all text-base text-white">{selectedPhotographer.wechat || "未填写"}</p>
+                {selectedPhotographer.wechat ? (
+                  <button type="button" onClick={() => copyText(selectedPhotographer.wechat ?? "")} className="sgc-button-primary mt-2 w-full px-4 py-3">复制微信</button>
+                ) : null}
               </div>
               {selectedPhotographer.sample_url ? (
                 <div>

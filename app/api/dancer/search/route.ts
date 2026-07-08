@@ -88,11 +88,11 @@ export async function POST(request: Request) {
 
     const photographersByProgramId = new Map<
       string,
-      Array<{ id: string; display_name: string; wechat: string; sample_url: string | null }>
+      Array<{ id: string; display_name: string; wechat: string | null; sample_url: string | null }>
     >();
     for (const row of (availableData ?? []) as unknown as AvailablePhotographerRow[]) {
       const photographer = firstRelated(row.photographers);
-      if (!photographer?.is_active || !photographer.wechat) continue;
+      if (!photographer?.is_active) continue;
       const existing = photographersByProgramId.get(row.program_id) ?? [];
       existing.push({
         id: photographer.id,

@@ -1,4 +1,5 @@
 delete from photographer_program_status;
+delete from photographers;
 delete from program_dancers;
 delete from programs;
 delete from dancers;
@@ -31,8 +32,22 @@ on conflict (nickname) do update set display_name = excluded.display_name;
 
 insert into photographers (photographer_code, display_name, wechat, sample_url)
 values
-  ('nico001', 'Nico', null, null),
-  ('yuki002', 'Yuki', null, null)
+  ('鲨鱼', '鲨鱼', null, null),
+  ('OR', 'OR', null, null),
+  ('致键', '致键', null, null),
+  ('老李', '老李', null, null),
+  ('主机位', '主机位', null, null),
+  ('一木', '一木', null, null),
+  ('迷弟', '迷弟', null, null),
+  ('陌轩', '陌轩', null, null),
+  ('胖虎', '胖虎', null, null),
+  ('衍一', '衍一', null, null),
+  ('mx', 'mx', null, null),
+  ('nico', 'nico', null, null),
+  ('Roy', 'Roy', null, null),
+  ('一维', '一维', null, null),
+  ('可乐', '可乐', null, null),
+  ('CupX', 'CupX', null, null)
 on conflict (photographer_code) do update set display_name = excluded.display_name;
 
 insert into program_dancers (program_id, dancer_id)

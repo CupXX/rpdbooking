@@ -1,5 +1,4 @@
 delete from photographer_program_status;
-delete from photographers;
 delete from program_dancers;
 delete from programs;
 delete from dancers;
@@ -9,13 +8,14 @@ values
   (1, '第一组', 'aespa - LEMONADE', '第一组'),
   (2, '第二组', 'Hearts2Hearts - RUDE', '第二组'),
   (3, '第三组', 'KISS OF LIFE - Who is She', '第三组'),
-  (4, '第四组', 'Hearts2Hearts - RUDE', '第四组');
+  (4, '第四组', 'Hearts2Hearts - RUDE', '第四组'),
+  (5, '第五组', 'aespa - LEMONADE', '第五组');
 
 insert into dancers (nickname, display_name)
 values
-  ('蕊蕊', '蕊蕊'),
+  ('慈慈', '慈慈'),
   ('西西', '西西'),
-  ('慈洁', '慈洁'),
+  ('慈禧', '慈禧'),
   ('西慈', '西慈'),
   ('小一', '小一'),
   ('小二', '小二'),
@@ -27,7 +27,10 @@ values
   ('鱼鱼', '鱼鱼'),
   ('大鱼', '大鱼'),
   ('小鱼', '小鱼'),
-  ('鱼鳞', '鱼鳞')
+  ('鱼鳞', '鱼鳞'),
+  ('鳗鱼', '鳗鱼'),
+  ('呆呆鱼', '呆呆鱼'),
+  ('Cici', 'Cici')
 on conflict (nickname) do update set display_name = excluded.display_name;
 
 insert into photographers (photographer_code, display_name, wechat, sample_url)
@@ -53,7 +56,7 @@ on conflict (photographer_code) do update set display_name = excluded.display_na
 insert into program_dancers (program_id, dancer_id)
 select p.id, d.id
 from programs p
-join dancers d on d.nickname in ('蕊蕊', '西西', '慈洁', '西慈')
+join dancers d on d.nickname in ('慈慈', '西西', '慈禧', '西慈')
 where p.title = '第一组'
 on conflict (program_id, dancer_id) do nothing;
 
@@ -74,6 +77,13 @@ on conflict (program_id, dancer_id) do nothing;
 insert into program_dancers (program_id, dancer_id)
 select p.id, d.id
 from programs p
-join dancers d on d.nickname in ('鱼鱼', '大鱼', '小鱼', '鱼鳞')
+join dancers d on d.nickname in ('鱼鱼', '大鱼', '小鱼', '鱼鳞', '鳗鱼', '呆呆鱼')
 where p.title = '第四组'
+on conflict (program_id, dancer_id) do nothing;
+
+insert into program_dancers (program_id, dancer_id)
+select p.id, d.id
+from programs p
+join dancers d on d.nickname in ('慈慈', 'Cici', '慈禧', '西慈')
+where p.title = '第五组'
 on conflict (program_id, dancer_id) do nothing;

@@ -285,7 +285,14 @@ export default function PhotographerPage() {
                   <p className="sgc-subtle text-sm">当前摄影</p>
                   <h2 className="mt-1 text-xl font-bold text-white">{data.photographer.display_name}</h2>
                   <p className="sgc-muted mt-2 break-all text-sm">微信号：{data.photographer.wechat || "未填写"}</p>
-                  {data.photographer.sample_url ? <p className="sgc-muted mt-1 break-all text-sm">样片：{data.photographer.sample_url}</p> : null}
+                  {data.photographer.sample_url ? (
+                    <p className="sgc-muted mt-1 break-all text-sm">
+                      样片：
+                      <a href={data.photographer.sample_url} target="_blank" rel="noreferrer" className="sgc-link">
+                        {data.photographer.sample_url}
+                      </a>
+                    </p>
+                  ) : null}
                 </div>
                 <button type="button" onClick={() => setEditingProfile((value) => !value)} className="sgc-button-secondary px-3 py-2 text-sm">编辑资料</button>
               </div>

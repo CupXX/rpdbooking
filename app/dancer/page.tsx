@@ -151,7 +151,14 @@ export default function DancerPage() {
               {selectedPhotographer.sample_url ? (
                 <div>
                   <p className="sgc-label">样片链接</p>
-                  <p className="mt-1 break-all text-base text-white">{selectedPhotographer.sample_url}</p>
+                  <a
+                    href={selectedPhotographer.sample_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="sgc-link mt-1 block break-all text-base"
+                  >
+                    {selectedPhotographer.sample_url}
+                  </a>
                   <button type="button" onClick={() => copyText(selectedPhotographer.sample_url ?? "")} className="sgc-button-secondary mt-2 w-full px-4 py-3">复制链接</button>
                 </div>
               ) : null}

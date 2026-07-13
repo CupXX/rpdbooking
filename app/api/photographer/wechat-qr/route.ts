@@ -1,5 +1,5 @@
 import { getCurrentPhotographerId } from "@/lib/auth";
-import { isWechatQrMimeType, wechatQrExtensionForMimeType } from "@/lib/contactMethod";
+import { createWechatQrPath, isWechatQrMimeType } from "@/lib/contactMethod";
 import { jsonError } from "@/lib/http";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 import { getWechatQrPublicUrl, WECHAT_QR_BUCKET, WECHAT_QR_MAX_SIZE_BYTES } from "@/lib/wechatQr";
@@ -25,8 +25,7 @@ export async function POST(request: Request) {
 
     if (currentError) throw currentError;
 
-    const extension = wechatQrExtensionForMimeType(file.type);
-    const nextPath = `${photographerId}/wechat-qr.${extension}`;
+    const nextPath = createWechatQrPath(photographerId, file.type, crypto.randomUUID());
     const { error: uploadError } = await supabase.storage
       .from(WECHAT_QR_BUCKET)
       .upload(nextPath, file, { contentType: file.type, upsert: true });

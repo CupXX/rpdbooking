@@ -11,3 +11,7 @@ export function wechatQrExtensionForMimeType(value: string) {
   if (value === "image/webp") return "webp";
   return "jpg";
 }
+
+export function createWechatQrPath(photographerId: string, mimeType: string, uploadId: string) {
+  return `${photographerId}/${uploadId}.${wechatQrExtensionForMimeType(mimeType)}`;
+}

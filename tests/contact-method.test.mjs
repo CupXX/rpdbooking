@@ -23,3 +23,14 @@ test("requires either wechat text or a QR image URL before marking available", a
   assert.equal(hasContactMethod("cupx_wechat", null), true);
   assert.equal(hasContactMethod(null, "https://example.com/qr.png"), true);
 });
+
+test("creates a new QR storage path for each upload", async () => {
+  const { createWechatQrPath } = await loadContactModule();
+
+  const first = createWechatQrPath("photographer-1", "image/png", "upload-a");
+  const second = createWechatQrPath("photographer-1", "image/png", "upload-b");
+
+  assert.equal(first, "photographer-1/upload-a.png");
+  assert.equal(second, "photographer-1/upload-b.png");
+  assert.notEqual(first, second);
+});

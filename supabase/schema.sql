@@ -30,11 +30,14 @@ create table if not exists photographers (
   display_name text not null,
   password_hash text,
   wechat text,
+  wechat_qr_path text,
   sample_url text,
   is_active boolean default true,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
+
+alter table photographers add column if not exists wechat_qr_path text;
 
 create table if not exists photographer_program_status (
   id uuid primary key default gen_random_uuid(),
@@ -49,6 +52,19 @@ create index if not exists idx_program_dancers_dancer_id on program_dancers(danc
 create index if not exists idx_program_dancers_program_id on program_dancers(program_id);
 create index if not exists idx_photographer_program_status_program_id on photographer_program_status(program_id);
 create index if not exists idx_photographer_program_status_photographer_id on photographer_program_status(photographer_id);
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'photographer-wechat-qrs',
+  'photographer-wechat-qrs',
+  true,
+  2097152,
+  array['image/png', 'image/jpeg', 'image/webp']
+)
+on conflict (id) do update set
+  public = excluded.public,
+  file_size_limit = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types;
 
 alter table programs enable row level security;
 alter table dancers enable row level security;

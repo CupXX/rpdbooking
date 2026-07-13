@@ -148,6 +148,16 @@ export default function DancerPage() {
                   <button type="button" onClick={() => copyText(selectedPhotographer.wechat ?? "")} className="sgc-button-primary mt-2 w-full px-4 py-3">复制微信</button>
                 ) : null}
               </div>
+              {selectedPhotographer.wechat_qr_url ? (
+                <div>
+                  <p className="sgc-label">微信二维码</p>
+                  <img
+                    src={selectedPhotographer.wechat_qr_url}
+                    alt={`${selectedPhotographer.display_name} 的微信二维码`}
+                    className="mt-2 w-full rounded-lg border border-white/20 bg-white object-contain p-3"
+                  />
+                </div>
+              ) : null}
               {selectedPhotographer.sample_url ? (
                 <div>
                   <p className="sgc-label">样片链接</p>

@@ -1,4 +1,5 @@
 import { getCurrentPhotographerId } from "@/lib/auth";
+import { hasContactMethod } from "@/lib/contactMethod";
 import { jsonError, readJson } from "@/lib/http";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 import { asBoolean, asNonEmptyString } from "@/lib/validators";
@@ -16,6 +17,20 @@ export async function POST(request: Request) {
 
   try {
     const supabase = getSupabaseAdmin();
+    if (available) {
+      const { data: photographerData, error: photographerError } = await supabase
+        .from("photographers")
+        .select("wechat, wechat_qr_path")
+        .eq("id", photographerId)
+        .maybeSingle();
+
+      if (photographerError) throw photographerError;
+      const photographer = photographerData as { wechat: string | null; wechat_qr_path: string | null } | null;
+      if (!hasContactMethod(photographer?.wechat, photographer?.wechat_qr_path)) {
+        return jsonError("请至少填写微信号或上传微信二维码后再开放可约。");
+      }
+    }
+
     const { error } = await supabase
       .from("photographer_program_status")
       .upsert(

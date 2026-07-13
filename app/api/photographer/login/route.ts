@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     const supabase = getSupabaseAdmin();
     const { data, error } = await supabase
       .from("photographers")
-      .select("id, photographer_code, display_name, wechat, sample_url, is_active")
+      .select("id, photographer_code, display_name, wechat, wechat_qr_path, sample_url, is_active")
       .eq("photographer_code", photographerCode)
       .eq("is_active", true)
       .maybeSingle();

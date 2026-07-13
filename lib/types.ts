@@ -18,6 +18,7 @@ export type Photographer = {
   photographer_code: string;
   display_name: string;
   wechat: string | null;
+  wechat_qr_path: string | null;
   sample_url: string | null;
   is_active: boolean | null;
 };
@@ -30,6 +31,7 @@ export type DancerSearchProgram = Program & {
     id: string;
     display_name: string;
     wechat: string | null;
+    wechat_qr_url: string | null;
     sample_url: string | null;
   }>;
 };
@@ -49,6 +51,7 @@ export type DashboardResponse = {
     photographer_code: string;
     display_name: string;
     wechat: string | null;
+    wechat_qr_url: string | null;
     sample_url: string | null;
   };
   programs: DashboardProgram[];

@@ -1,6 +1,7 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { hasContactMethod } from "@/lib/contactMethod";
 import type { DashboardProgram, DashboardResponse, PhotographerOption } from "@/lib/types";
 
 type PendingAvailabilityAction =
@@ -18,8 +19,11 @@ export default function PhotographerPage() {
   const [bulkLoading, setBulkLoading] = useState(false);
   const [editingProfile, setEditingProfile] = useState(false);
   const [wechat, setWechat] = useState("");
+  const [wechatQrUrl, setWechatQrUrl] = useState<string | null>(null);
   const [sampleUrl, setSampleUrl] = useState("");
   const [profileMessage, setProfileMessage] = useState("");
+  const [wechatQrUploading, setWechatQrUploading] = useState(false);
+  const [wechatQrDeleting, setWechatQrDeleting] = useState(false);
   const [pendingAvailability, setPendingAvailability] = useState<PendingAvailabilityAction | null>(null);
   const [wechatDraft, setWechatDraft] = useState("");
   const [wechatModalError, setWechatModalError] = useState("");
@@ -47,6 +51,7 @@ export default function PhotographerPage() {
     setData(dashboard);
     setSelectedPhotographerCode(dashboard.photographer.photographer_code);
     setWechat(dashboard.photographer.wechat ?? "");
+    setWechatQrUrl(dashboard.photographer.wechat_qr_url);
     setSampleUrl(dashboard.photographer.sample_url ?? "");
   }
 
@@ -101,7 +106,7 @@ export default function PhotographerPage() {
   }
 
   function needsWechatBeforeAvailable() {
-    return !data?.photographer.wechat?.trim();
+    return !hasContactMethod(data?.photographer.wechat, data?.photographer.wechat_qr_url);
   }
 
   function requestProgramUpdate(program: DashboardProgram, available: boolean) {
@@ -204,6 +209,68 @@ export default function PhotographerPage() {
     }
   }
 
+  async function uploadWechatQr(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setWechatQrUploading(true);
+    setProfileMessage("");
+    setError("");
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const response = await fetch("/api/photographer/wechat-qr", {
+        method: "POST",
+        body: formData,
+      });
+      const responseData = await response.json();
+      if (!response.ok || !responseData.success) {
+        setProfileMessage(responseData.message ?? "上传微信二维码失败，请稍后重试。");
+        return;
+      }
+
+      const nextWechatQrUrl = responseData.wechat_qr_url as string | null;
+      setWechatQrUrl(nextWechatQrUrl);
+      setData((current) => current ? {
+        ...current,
+        photographer: { ...current.photographer, wechat_qr_url: nextWechatQrUrl },
+      } : current);
+      setProfileMessage("微信二维码已更新。");
+    } catch {
+      setProfileMessage("网络异常，请稍后重试。");
+    } finally {
+      setWechatQrUploading(false);
+      event.target.value = "";
+    }
+  }
+
+  async function deleteWechatQr() {
+    if (!window.confirm("确认删除微信二维码吗？")) return;
+
+    setWechatQrDeleting(true);
+    setProfileMessage("");
+    setError("");
+    try {
+      const response = await fetch("/api/photographer/wechat-qr", { method: "DELETE" });
+      const responseData = await response.json();
+      if (!response.ok || !responseData.success) {
+        setProfileMessage(responseData.message ?? "删除微信二维码失败，请稍后重试。");
+        return;
+      }
+
+      setWechatQrUrl(null);
+      setData((current) => current ? {
+        ...current,
+        photographer: { ...current.photographer, wechat_qr_url: null },
+      } : current);
+      setProfileMessage("微信二维码已删除。");
+    } catch {
+      setProfileMessage("网络异常，请稍后重试。");
+    } finally {
+      setWechatQrDeleting(false);
+    }
+  }
+
   async function saveWechatAndContinue(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const nextWechat = wechatDraft.trim();
@@ -285,6 +352,7 @@ export default function PhotographerPage() {
                   <p className="sgc-subtle text-sm">当前摄影</p>
                   <h2 className="mt-1 text-xl font-bold text-white">{data.photographer.display_name}</h2>
                   <p className="sgc-muted mt-2 break-all text-sm">微信号：{data.photographer.wechat || "未填写"}</p>
+                  <p className="sgc-muted mt-1 text-sm">微信二维码：{data.photographer.wechat_qr_url ? "已上传" : "未上传"}</p>
                   {data.photographer.sample_url ? (
                     <p className="sgc-muted mt-1 break-all text-sm">
                       样片：
@@ -301,6 +369,35 @@ export default function PhotographerPage() {
                 <form onSubmit={saveProfile} className="mt-4 border-t border-white/15 pt-4">
                   <label className="sgc-label block" htmlFor="wechat">微信号</label>
                   <input id="wechat" value={wechat} onChange={(event) => setWechat(event.target.value)} className="sgc-input mt-2 px-4 py-3" />
+                  <div className="mt-4">
+                    <p className="sgc-label">微信二维码</p>
+                    {wechatQrUrl ? (
+                      <img src={wechatQrUrl} alt="微信二维码" className="mt-2 h-40 w-40 rounded-lg border border-white/20 bg-white object-contain p-2" />
+                    ) : (
+                      <p className="sgc-muted mt-2 text-sm">未上传</p>
+                    )}
+                    <label className="sgc-button-secondary mt-3 inline-block cursor-pointer px-4 py-3 text-sm" htmlFor="wechatQr">
+                      {wechatQrUploading ? "上传中..." : wechatQrUrl ? "更换二维码" : "上传二维码"}
+                    </label>
+                    <input
+                      id="wechatQr"
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      disabled={wechatQrUploading}
+                      onChange={uploadWechatQr}
+                      className="sr-only"
+                    />
+                    {wechatQrUrl ? (
+                      <button
+                        type="button"
+                        disabled={wechatQrDeleting}
+                        onClick={() => void deleteWechatQr()}
+                        className="sgc-button-danger ml-3 px-4 py-3 text-sm"
+                      >
+                        {wechatQrDeleting ? "删除中..." : "删除二维码"}
+                      </button>
+                    ) : null}
+                  </div>
                   <label className="sgc-label mt-4 block" htmlFor="sampleUrl">样片链接</label>
                   <input id="sampleUrl" value={sampleUrl} onChange={(event) => setSampleUrl(event.target.value)} className="sgc-input mt-2 px-4 py-3" />
                   <button type="submit" className="sgc-button-primary mt-4 w-full px-4 py-3">保存资料</button>
@@ -367,7 +464,7 @@ export default function PhotographerPage() {
           <section className="sgc-panel w-full max-w-md p-5">
             <div className="space-y-2">
               <p className="sgc-subtle text-sm">开放可约前需要联系方式</p>
-              <h2 className="text-xl font-bold text-white">填写微信号</h2>
+              <h2 className="text-xl font-bold text-white">填写微信号或上传二维码</h2>
             </div>
             <form onSubmit={saveWechatAndContinue} className="mt-5">
               <label className="sgc-label block" htmlFor="wechatBeforeAvailable">微信号</label>
@@ -378,6 +475,17 @@ export default function PhotographerPage() {
                 className="sgc-input mt-2 px-4 py-3"
                 autoFocus
               />
+              <button
+                type="button"
+                disabled={wechatModalSaving}
+                onClick={() => {
+                  setPendingAvailability(null);
+                  setEditingProfile(true);
+                }}
+                className="sgc-button-secondary mt-3 w-full px-4 py-3"
+              >
+                去上传微信二维码
+              </button>
               {wechatModalError ? <p className="mt-3 text-sm text-red-300">{wechatModalError}</p> : null}
               <div className="mt-5 grid grid-cols-2 gap-3">
                 <button

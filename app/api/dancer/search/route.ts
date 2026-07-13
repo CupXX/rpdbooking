@@ -2,6 +2,7 @@ import { jsonError, readJson } from "@/lib/http";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 import type { Dancer, DancerSearchProgram, Photographer, Program } from "@/lib/types";
 import { asNonEmptyString } from "@/lib/validators";
+import { getWechatQrPublicUrl } from "@/lib/wechatQr";
 
 type MaybeArray<T> = T | T[] | null;
 
@@ -16,7 +17,7 @@ type ProgramDancerDancerRow = {
 
 type AvailablePhotographerRow = {
   program_id: string;
-  photographers: MaybeArray<Pick<Photographer, "id" | "display_name" | "wechat" | "sample_url" | "is_active">>;
+  photographers: MaybeArray<Pick<Photographer, "id" | "display_name" | "wechat" | "wechat_qr_path" | "sample_url" | "is_active">>;
 };
 
 function firstRelated<T>(value: MaybeArray<T>) {
@@ -69,7 +70,7 @@ export async function POST(request: Request) {
         .in("program_id", programIds),
       supabase
         .from("photographer_program_status")
-        .select("program_id, photographers(id, display_name, wechat, sample_url, is_active)")
+        .select("program_id, photographers(id, display_name, wechat, wechat_qr_path, sample_url, is_active)")
         .in("program_id", programIds)
         .eq("available", true),
     ]);
@@ -88,7 +89,7 @@ export async function POST(request: Request) {
 
     const photographersByProgramId = new Map<
       string,
-      Array<{ id: string; display_name: string; wechat: string | null; sample_url: string | null }>
+      Array<{ id: string; display_name: string; wechat: string | null; wechat_qr_url: string | null; sample_url: string | null }>
     >();
     for (const row of (availableData ?? []) as unknown as AvailablePhotographerRow[]) {
       const photographer = firstRelated(row.photographers);
@@ -98,6 +99,7 @@ export async function POST(request: Request) {
         id: photographer.id,
         display_name: photographer.display_name,
         wechat: photographer.wechat,
+        wechat_qr_url: getWechatQrPublicUrl(supabase, photographer.wechat_qr_path),
         sample_url: photographer.sample_url,
       });
       photographersByProgramId.set(row.program_id, existing);

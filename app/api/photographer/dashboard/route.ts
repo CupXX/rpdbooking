@@ -2,6 +2,7 @@ import { getCurrentPhotographerId } from "@/lib/auth";
 import { jsonError } from "@/lib/http";
 import { getSupabaseAdmin } from "@/lib/supabaseAdmin";
 import type { Dancer, DashboardProgram, Photographer, Program } from "@/lib/types";
+import { getWechatQrPublicUrl } from "@/lib/wechatQr";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +31,7 @@ export async function GET() {
     ] = await Promise.all([
       supabase
         .from("photographers")
-        .select("id, photographer_code, display_name, wechat, sample_url, is_active")
+        .select("id, photographer_code, display_name, wechat, wechat_qr_path, sample_url, is_active")
         .eq("id", photographerId)
         .eq("is_active", true)
         .maybeSingle(),
@@ -79,6 +80,7 @@ export async function GET() {
         photographer_code: photographer.photographer_code,
         display_name: photographer.display_name,
         wechat: photographer.wechat,
+        wechat_qr_url: getWechatQrPublicUrl(supabase, photographer.wechat_qr_path),
         sample_url: photographer.sample_url,
       },
       programs: responsePrograms,

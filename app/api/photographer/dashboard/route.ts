@@ -31,7 +31,7 @@ export async function GET() {
     ] = await Promise.all([
       supabase
         .from("photographers")
-        .select("id, photographer_code, display_name, wechat, wechat_qr_path, sample_url, is_active")
+        .select("id, photographer_code, display_name, wechat, wechat_qr_path, sample_account, sample_url, is_active")
         .eq("id", photographerId)
         .eq("is_active", true)
         .maybeSingle(),
@@ -81,6 +81,7 @@ export async function GET() {
         display_name: photographer.display_name,
         wechat: photographer.wechat,
         wechat_qr_url: getWechatQrPublicUrl(supabase, photographer.wechat_qr_path),
+        sample_account: photographer.sample_account,
         sample_url: photographer.sample_url,
       },
       programs: responsePrograms,

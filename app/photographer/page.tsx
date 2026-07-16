@@ -20,6 +20,7 @@ export default function PhotographerPage() {
   const [editingProfile, setEditingProfile] = useState(false);
   const [wechat, setWechat] = useState("");
   const [wechatQrUrl, setWechatQrUrl] = useState<string | null>(null);
+  const [sampleAccount, setSampleAccount] = useState("");
   const [sampleUrl, setSampleUrl] = useState("");
   const [profileMessage, setProfileMessage] = useState("");
   const [wechatQrUploading, setWechatQrUploading] = useState(false);
@@ -52,6 +53,7 @@ export default function PhotographerPage() {
     setSelectedPhotographerCode(dashboard.photographer.photographer_code);
     setWechat(dashboard.photographer.wechat ?? "");
     setWechatQrUrl(dashboard.photographer.wechat_qr_url);
+    setSampleAccount(dashboard.photographer.sample_account ?? "");
     setSampleUrl(dashboard.photographer.sample_url ?? "");
   }
 
@@ -191,7 +193,7 @@ export default function PhotographerPage() {
       const response = await fetch("/api/photographer/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ wechat, sample_url: sampleUrl }),
+        body: JSON.stringify({ wechat, sample_account: sampleAccount, sample_url: sampleUrl }),
       });
       const responseData = await response.json();
       if (!response.ok || !responseData.success) {
@@ -200,7 +202,7 @@ export default function PhotographerPage() {
       }
       setData((current) => current ? {
         ...current,
-        photographer: { ...current.photographer, wechat, sample_url: sampleUrl || null },
+        photographer: { ...current.photographer, wechat, sample_account: sampleAccount || null, sample_url: sampleUrl || null },
       } : current);
       setEditingProfile(false);
       setProfileMessage("资料已更新。");
@@ -286,7 +288,7 @@ export default function PhotographerPage() {
       const response = await fetch("/api/photographer/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ wechat: nextWechat, sample_url: sampleUrl }),
+        body: JSON.stringify({ wechat: nextWechat, sample_account: sampleAccount, sample_url: sampleUrl }),
       });
       const responseData = await response.json();
       if (!response.ok || !responseData.success) {
@@ -353,6 +355,7 @@ export default function PhotographerPage() {
                   <h2 className="mt-1 text-xl font-bold text-white">{data.photographer.display_name}</h2>
                   <p className="sgc-muted mt-2 break-all text-sm">微信号：{data.photographer.wechat || "未填写"}</p>
                   <p className="sgc-muted mt-1 text-sm">微信二维码：{data.photographer.wechat_qr_url ? "已上传" : "未上传"}</p>
+                  {data.photographer.sample_account ? <p className="sgc-muted mt-1 break-all text-sm">样片账号：{data.photographer.sample_account}</p> : null}
                   {data.photographer.sample_url ? (
                     <p className="sgc-muted mt-1 break-all text-sm">
                       样片：
@@ -398,7 +401,9 @@ export default function PhotographerPage() {
                       </button>
                     ) : null}
                   </div>
-                  <label className="sgc-label mt-4 block" htmlFor="sampleUrl">样片链接</label>
+                  <label className="sgc-label mt-4 block" htmlFor="sampleAccount">样片账号（附平台）（选填）</label>
+                  <input id="sampleAccount" value={sampleAccount} onChange={(event) => setSampleAccount(event.target.value)} className="sgc-input mt-2 px-4 py-3" />
+                  <label className="sgc-label mt-4 block" htmlFor="sampleUrl">样片链接（选填）</label>
                   <input id="sampleUrl" value={sampleUrl} onChange={(event) => setSampleUrl(event.target.value)} className="sgc-input mt-2 px-4 py-3" />
                   <button type="submit" className="sgc-button-primary mt-4 w-full px-4 py-3">保存资料</button>
                 </form>

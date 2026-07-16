@@ -158,6 +158,12 @@ export default function DancerPage() {
                   />
                 </div>
               ) : null}
+              {selectedPhotographer.sample_account ? (
+                <div>
+                  <p className="sgc-label">样片账号</p>
+                  <p className="mt-1 break-all text-base text-white">{selectedPhotographer.sample_account}</p>
+                </div>
+              ) : null}
               {selectedPhotographer.sample_url ? (
                 <div>
                   <p className="sgc-label">样片链接</p>

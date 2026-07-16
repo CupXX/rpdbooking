@@ -17,7 +17,7 @@ type ProgramDancerDancerRow = {
 
 type AvailablePhotographerRow = {
   program_id: string;
-  photographers: MaybeArray<Pick<Photographer, "id" | "display_name" | "wechat" | "wechat_qr_path" | "sample_url" | "is_active">>;
+  photographers: MaybeArray<Pick<Photographer, "id" | "display_name" | "wechat" | "wechat_qr_path" | "sample_account" | "sample_url" | "is_active">>;
 };
 
 function firstRelated<T>(value: MaybeArray<T>) {
@@ -70,7 +70,7 @@ export async function POST(request: Request) {
         .in("program_id", programIds),
       supabase
         .from("photographer_program_status")
-        .select("program_id, photographers(id, display_name, wechat, wechat_qr_path, sample_url, is_active)")
+        .select("program_id, photographers(id, display_name, wechat, wechat_qr_path, sample_account, sample_url, is_active)")
         .in("program_id", programIds)
         .eq("available", true),
     ]);
@@ -89,7 +89,7 @@ export async function POST(request: Request) {
 
     const photographersByProgramId = new Map<
       string,
-      Array<{ id: string; display_name: string; wechat: string | null; wechat_qr_url: string | null; sample_url: string | null }>
+      Array<{ id: string; display_name: string; wechat: string | null; wechat_qr_url: string | null; sample_account: string | null; sample_url: string | null }>
     >();
     for (const row of (availableData ?? []) as unknown as AvailablePhotographerRow[]) {
       const photographer = firstRelated(row.photographers);
@@ -100,6 +100,7 @@ export async function POST(request: Request) {
         display_name: photographer.display_name,
         wechat: photographer.wechat,
         wechat_qr_url: getWechatQrPublicUrl(supabase, photographer.wechat_qr_path),
+        sample_account: photographer.sample_account,
         sample_url: photographer.sample_url,
       });
       photographersByProgramId.set(row.program_id, existing);

@@ -10,6 +10,7 @@ export async function POST(request: Request) {
 
   const body = await readJson(request);
   const wechat = asOptionalString(body?.wechat);
+  const sampleAccount = asOptionalString(body?.sample_account);
   const sampleUrl = asOptionalString(body?.sample_url);
 
   if (!isLikelyUrl(sampleUrl)) return jsonError("样片链接格式不正确。");
@@ -30,7 +31,7 @@ export async function POST(request: Request) {
 
     const { error } = await supabase
       .from("photographers")
-      .update({ wechat, sample_url: sampleUrl })
+      .update({ wechat, sample_account: sampleAccount, sample_url: sampleUrl })
       .eq("id", photographerId);
 
     if (error) throw error;

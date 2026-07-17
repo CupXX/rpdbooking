@@ -428,7 +428,7 @@ export default function PhotographerPage() {
                     return (
                       <tr key={program.id} className="align-middle">
                         <td className="w-10 px-3 py-3 text-sm font-bold text-white/55">
-                          {String(program.order_no).padStart(2, "0")}
+                          {String(program.order_no).padStart(2, "0")}组
                         </td>
                         <td className="px-1 py-3">
                           <p className="text-sm font-bold leading-5 text-white">{program.song_name ?? program.title}</p>

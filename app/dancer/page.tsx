@@ -93,7 +93,7 @@ export default function DancerPage() {
               <article key={program.id} className="sgc-card p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="sgc-subtle text-sm font-semibold">节目 {String(program.order_no).padStart(2, "0")}</p>
+                    <p className="sgc-subtle text-sm font-semibold">{String(program.order_no).padStart(2, "0")}组</p>
                     <h2 className="mt-0.5 text-xl font-bold leading-6 text-white">{program.song_name ?? program.title}</h2>
                   </div>
                 </div>

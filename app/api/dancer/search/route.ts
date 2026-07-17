@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     const { data: dancerData, error: dancerError } = await supabase
       .from("dancers")
       .select("id, nickname, display_name")
-      .eq("nickname", nickname)
+      .ilike("nickname", nickname)
       .maybeSingle();
 
     if (dancerError) throw dancerError;

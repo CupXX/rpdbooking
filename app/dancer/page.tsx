@@ -71,7 +71,7 @@ export default function DancerPage() {
             id="nickname"
             value={nickname}
             onChange={(event) => setNickname(event.target.value)}
-            placeholder="请输入报名昵称"
+            placeholder="请输入您节目单中的昵称"
             className="sgc-input mt-2 px-4 py-3 text-base"
           />
           <button

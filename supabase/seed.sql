@@ -64,6 +64,31 @@ join dancers d on d.nickname in ('慈慈', '西西', '慈禧', '西慈')
 where p.title = '第一组'
 on conflict (program_id, dancer_id) do nothing;
 
+with camera_positions(display_name, camera_position) as (
+  values
+    ('鲨鱼', '前排左侧'),
+    ('OR', '前排左侧'),
+    ('致键', '前排左侧'),
+    ('OLDLILI', '前排左侧'),
+    ('一木', '前排右侧'),
+    ('陌轩', '前排右侧'),
+    ('胖虎', '前排右侧'),
+    ('熊星', '前排右侧'),
+    ('Rxxxh', '高空左侧'),
+    ('CupX', '高空左侧'),
+    ('nico', '高空左侧'),
+    ('可乐', '高空左侧'),
+    ('一维', '高空右侧'),
+    ('迷弟', '高空右侧'),
+    ('寿司', '高空右侧'),
+    ('小蒲', '高空右侧'),
+    ('Roy', '高空中间')
+)
+update photographers p
+set camera_position = camera_positions.camera_position
+from camera_positions
+where p.display_name = camera_positions.display_name;
+
 insert into program_dancers (program_id, dancer_id)
 select p.id, d.id
 from programs p

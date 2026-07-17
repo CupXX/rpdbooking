@@ -94,14 +94,14 @@ export default function DancerPage() {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="sgc-subtle text-sm font-semibold">节目 {String(program.order_no).padStart(2, "0")}</p>
-                    <h2 className="mt-1 text-lg font-bold text-white">{program.song_name ?? program.title}</h2>
+                    <h2 className="mt-0.5 text-xl font-bold leading-6 text-white">{program.song_name ?? program.title}</h2>
                   </div>
                 </div>
 
-                <p className="sgc-muted mt-3 text-sm leading-6">{program.group_name ?? program.title}</p>
+                <p className="sgc-muted mt-2 text-sm leading-5">{program.group_name ?? program.title}</p>
 
                 {program.dancers.length > 0 ? (
-                  <p className="sgc-muted mt-3 text-sm leading-6">
+                  <p className="sgc-muted mt-1 text-sm leading-5">
                     {program.dancers.map((dancer) => dancer.display_name ?? dancer.nickname).join("、")}
                   </p>
                 ) : null}
@@ -112,7 +112,9 @@ export default function DancerPage() {
                   ) : (
                     program.available_photographers.map((photographer) => (
                       <div key={photographer.id} className="flex items-center justify-between gap-3 rounded-lg border border-white/15 px-3 py-3">
-                        <span className="font-semibold text-white">{photographer.display_name}</span>
+                        <span className="font-semibold text-white">
+                          {photographer.display_name}{photographer.camera_position ? `（${photographer.camera_position}）` : ""}
+                        </span>
                         <button
                           type="button"
                           onClick={() => setSelectedPhotographer(photographer)}

@@ -19,6 +19,7 @@ export type Photographer = {
   display_name: string;
   wechat: string | null;
   wechat_qr_path: string | null;
+  camera_position: string | null;
   sample_account: string | null;
   sample_url: string | null;
   is_active: boolean | null;
@@ -31,6 +32,7 @@ export type DancerSearchProgram = Program & {
   available_photographers: Array<{
     id: string;
     display_name: string;
+    camera_position: string | null;
     wechat: string | null;
     wechat_qr_url: string | null;
     sample_account: string | null;

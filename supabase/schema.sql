@@ -31,6 +31,7 @@ create table if not exists photographers (
   password_hash text,
   wechat text,
   wechat_qr_path text,
+  camera_position text,
   sample_account text,
   sample_url text,
   is_active boolean default true,
@@ -39,6 +40,7 @@ create table if not exists photographers (
 );
 
 alter table photographers add column if not exists wechat_qr_path text;
+alter table photographers add column if not exists camera_position text;
 alter table photographers add column if not exists sample_account text;
 
 create table if not exists photographer_program_status (
